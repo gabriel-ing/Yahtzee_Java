@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Random;
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 
 public class YahtzeeFunctions{
@@ -30,7 +32,7 @@ public class YahtzeeFunctions{
                 int value = scores.get(key);
                 String valueString = Integer.toString(value);
                 scoresLabels.get(key).setText(valueString);
-                scoresLabels.get(key).setForeground(new Color(0, 128, 15));
+                scoresLabels.get(key).setForeground(new Color(255, 20, 20));
                 
                 }
             }
@@ -39,12 +41,16 @@ public class YahtzeeFunctions{
         int i = 0;
         int topHalfTotal=0;
         int bottomHalfTotal = 0;
-        
+        String[] topHalfKeys = {"Ones", "Twos","Threes", "Fours",
+        "Fives", "Sixes"};
+        List<String> topHalfKeysList = Arrays.asList(topHalfKeys);
         for (String key: addedScores.keySet()){
             System.out.print(key);
             System.out.print(addedScores.get(key));
             System.out.println("");
-            if (i<6){
+
+            if (topHalfKeysList.contains(key)){
+                System.out.println("Tophalf");
                 topHalfTotal+= addedScores.get(key);
             } else {
                 bottomHalfTotal +=addedScores.get(key);
