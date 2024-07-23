@@ -1,13 +1,13 @@
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.util.LinkedHashMap;
-import java.awt.*;
-import java.io.IOException;
 
 
 class Yahtzee{
@@ -16,7 +16,11 @@ class Yahtzee{
     private static LinkedHashMap<String, Integer> scores = new LinkedHashMap<>();
     private static LinkedHashMap<String, Integer> addedScores = new LinkedHashMap<>();
     private static int turns = 0;
+
+    private static int numPlayers = 0;
+    private static ArrayList<String> playerNames = new ArrayList<>(); 
     public static void main(String args[]){
+        
         //System.out.println(rolls);
         for (int i=0; i<5; i++){
             rolls.add(1);
@@ -26,8 +30,8 @@ class Yahtzee{
         LinkedHashMap<String, Integer> emptyScores = initialScoringFunction.getEmptyScores();
         //System.out.println(emptyScores);
         JFrame frame = new JFrame("Yahtzee Game");
-
-
+        showDialog(frame);
+        System.out.println(playerNames);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500,650);
 
@@ -124,6 +128,7 @@ class Yahtzee{
         rollDice.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 if (nRerolls==0){
+                    System.out.println(playerNames);
                     rolls.clear();
                     rolls = YahtzeeFunctions.rollFiveDice();
 
@@ -240,6 +245,7 @@ class Yahtzee{
         newGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 turns=0; 
+                playerNames.clear();
                 rolls.clear();
                 addedScores.clear();
                 for (String key: scoresLabels.keySet()){
@@ -256,8 +262,86 @@ class Yahtzee{
                 for (JButton button: keepButtons.values()){
                     button.setEnabled(false);
                 }
+                showDialog(frame);
             }
         });
 
     }
+    private static void showDialog(JFrame parentFrame){
+        JPanel panel = new JPanel();
+        JLabel welcomeLabel = new JLabel("Welcome to Yahtzee!");
+        JLabel selectPlayersLabel = new JLabel("Select the number of players:");
+        panel.add(welcomeLabel);
+        panel.add(selectPlayersLabel);
+
+        Integer[] numbers = {1,2,3,4,5,6,7,8,9};
+        JComboBox<Integer> nPlayersBox = new JComboBox<>(numbers);
+        panel.add(nPlayersBox);
+
+        JButton getNumPlayers = new JButton("Select Number");
+        panel.add(getNumPlayers);
+        //JOptionPane.showConfirmDialog(
+        //    parentFrame,
+        //    panel,
+        //   "Player Information",
+        //   JOptionPane.OK_CANCEL_OPTION,
+        //    JOptionPane.PLAIN_MESSAGE
+        //);
+
+        JDialog inputDialog = new JDialog(parentFrame);
+        
+        inputDialog.setLayout(new BorderLayout());
+        inputDialog.setSize(300, 400);
+        inputDialog.add(panel,BorderLayout.CENTER);
+        inputDialog.setLocationRelativeTo(parentFrame);
+        
+        getNumPlayers.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                System.out.println("Yes");
+                Integer selectedNumber = (Integer) nPlayersBox.getSelectedItem();
+                numPlayers = selectedNumber.intValue();
+                getNumPlayers.setEnabled(false);
+                JPanel inputNamesPanel = new JPanel();
+                inputNamesPanel.setLayout(new GridLayout(numPlayers, 2));
+                JTextField[] nameFields = new JTextField[numPlayers];
+                for (int i=0; i<numPlayers; i++){
+                    String iString = Integer.toString(i+1);
+                    JLabel playerNameLabel = new JLabel("Player "+iString+" Initials: ");
+                    JTextField playerNameBox = new JTextField();
+                    nameFields[i] = playerNameBox;
+                    inputNamesPanel.add(playerNameLabel,BorderLayout.SOUTH);
+                    inputNamesPanel.add(playerNameBox, BorderLayout.SOUTH);}
+                panel.add(inputNamesPanel);
+                
+                JPanel buttonPanel = new JPanel();
+                JButton enterGameButton = new JButton("Enter Game");
+
+                buttonPanel.add(enterGameButton);
+
+                enterGameButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e){
+                        for (int j=0; j<numPlayers; j++){
+                            String playerName = nameFields[j].getText();
+                            if (playerName.equals("")){
+                                playerName = "P"+Integer.toString(j+1);
+                            } 
+                            playerNames.add(playerName);
+                        }
+                        inputDialog.dispose();
+                    }
+                });
+                panel.add(buttonPanel);
+                panel.revalidate();
+                panel.repaint();
+                
+            }
+
+        });
+        inputDialog.setVisible(true);
+
+
+        
+
+    }
+    
 }
