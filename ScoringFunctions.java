@@ -1,4 +1,3 @@
-import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,41 +9,70 @@ import java.util.Set;
 
 public class ScoringFunctions{
 
-    private static ArrayList<Integer> rolls;
-    private static LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+    private  static ArrayList<Integer> rolls;
+    private static LinkedHashMap<String, Integer> scores = new LinkedHashMap<>();
     
-    //public void ScoringFunctions(ArrayList<Integer> rolls){
-    //    ArrayList<Integer> this.rolls = rolls;
-    //}
+    public ScoringFunctions(ArrayList<Integer> rolls){
+        this.rolls = rolls;
+        this.countIndividuals();
+        this.checkStraights();
+        this.checkOfAKinds();
+        this.checkFullHouse();
+        this.findChance();
+        this.checkYahtzee();
+        //System.out.print("Scoringfunctions init scores: ");
+        //System.out.println(scores);
+    }
     public static void main(String[] digits){
         ArrayList<Integer> list = new ArrayList<>();
         for (char ch : digits[0].toCharArray()) {
             list.add(Character.getNumericValue(ch));
         }
-        rolls = list;
-
-        countIndividuals();
-        checkStraights();
-        checkOfAKinds();
         
-        checkFullHouse();
-        findChance();
-        checkYahtzee();
+        ScoringFunctions scoringFunctions = new ScoringFunctions(list);
+        scoringFunctions.countIndividuals();
+        scoringFunctions.checkStraights();
+        scoringFunctions.checkOfAKinds();
         
-        System.out.println(map);
+        scoringFunctions.checkFullHouse();
+        scoringFunctions.findChance();
+        scoringFunctions.checkYahtzee();
+        
+        //System.out.println(scores);
     }
-
-    private static void countIndividuals(){
+    public LinkedHashMap<String, Integer> getScores(){
+        return scores;
+    }
+    public LinkedHashMap<String, Integer> getEmptyScores(){
+        scores.clear(); 
+        String[] headings = {"Ones", "Twos", "Threes",
+            "Fours",
+            "Fives",
+            "Sixes",
+            "Small Straight",
+            "Large Straight",
+            "Three of a kind",
+            "Four of a kind",
+            "Full House",
+            "Chance",
+            "Yahtzee"};
+        for (String heading: headings){
+            scores.put(heading, -1);
+        }
+        return scores;
+    }
+    private void countIndividuals(){
         String[] titles = {"Ones", "Twos","Threes", "Fours",
          "Fives", "Sixes"};
-        for (int i =1; i<7; i++){
+        //System.out.println(rolls);
+        for (int i = 1; i<7; i++){
             int count = Collections.frequency(rolls, i);
             int value = count*i;
-            map.put(titles[i-1], value);
+            scores.put(titles[i-1], value);
         }
         ;
     }
-    private static void checkStraights(){
+    private void checkStraights(){
         ArrayList<Integer> rollsCopy = new ArrayList<Integer>(rolls);
         Collections.sort(rollsCopy);
         Set<Integer> set = new HashSet<>(rollsCopy);
@@ -55,11 +83,14 @@ public class ScoringFunctions{
             rollsCopy.get(2).equals(rollsCopy.get(1)+1) &&
             rollsCopy.get(3).equals(rollsCopy.get(2)+1)){
 
-                map.put("Small Straight", 30);
+                scores.put("Small Straight", 30);
 
             }
+            else{
+                scores.put("Small Straight", 0);
+            }
         } else{
-            map.put("Small Straight", 0);
+            scores.put("Small Straight", 0);
         }
         if (rollsCopy.size()==5){
             if (rollsCopy.get(1).equals(rollsCopy.get(0)+1) && 
@@ -67,14 +98,14 @@ public class ScoringFunctions{
             rollsCopy.get(3).equals(rollsCopy.get(2)+1) &&
             rollsCopy.get(4).equals(rollsCopy.get(3)+1) ){
     
-                map.put("Large Straight", 40);
+                scores.put("Large Straight", 40);
     
                 }
         } else{
-            map.put("Large Straight", 0);
+            scores.put("Large Straight", 0);
         }
     }
-    private static void checkOfAKinds(){
+    private void checkOfAKinds(){
         int max_count = 1;
         for (int i = 1; i < 7; i++) {
             int count = Collections.frequency(rolls, i);
@@ -85,31 +116,29 @@ public class ScoringFunctions{
         int rollsSum = rolls.get(0)+rolls.get(1)+rolls.get(2)+rolls.get(3)+rolls.get(4);
             
         if (max_count>=3){
-            map.put("Three of a kind", rollsSum);
+            scores.put("Three of a kind", rollsSum);
             } else{
-                map.put("Three of a kind:", 0);
+                scores.put("Three of a kind", 0);
             }
         if (max_count>=4){
-            map.put("Four of a kind", rollsSum);
+            scores.put("Four of a kind", rollsSum);
 
         } else{
-            map.put("Four of a kind", 0);
+            scores.put("Four of a kind", 0);
         }
     }    
-    private static void checkSize(){
 
-    }
-    private static void checkYahtzee(){
+    private void checkYahtzee(){
         Set<Integer> set = new HashSet<>(rolls);
         
         if (set.size()==1){
-            map.put("Yahtzee", 50);
+            scores.put("Yahtzee", 50);
         } else{
-            map.put("Yahtzee", 0);
+            scores.put("Yahtzee", 0);
         }
         }
     
-    private static void checkFullHouse(){
+    private void checkFullHouse(){
         Set<Integer>set = new HashSet<>(rolls);
         ArrayList<Integer> counts = new ArrayList<Integer>();
         if (set.size()==2){
@@ -119,18 +148,18 @@ public class ScoringFunctions{
             Collections.sort(counts);
             List<Integer> targetList = new ArrayList<>(Arrays.asList(2, 3));
             if (counts.equals(targetList)){
-                map.put("Full House", 25);
+                scores.put("Full House", 25);
             } else{
-                map.put("Full House", 0);
+                scores.put("Full House", 0);
             }
         
-        System.out.println("counts "+counts);
+        //System.out.println("counts "+counts);
         } else{
-            map.put("Full House", 0);
+            scores.put("Full House", 0);
         }
     }
-    private static void findChance(){
+    private void findChance(){
         int rollsSum = rolls.get(0)+rolls.get(1)+rolls.get(2)+rolls.get(3)+rolls.get(4);
-        map.put("Chance", rollsSum);
+        scores.put("Chance", rollsSum);
     }
 }
