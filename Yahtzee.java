@@ -14,10 +14,11 @@ class Yahtzee{
     static int nRerolls = 0; 
     private static ArrayList<Integer> rolls = new ArrayList<Integer>();
     private static LinkedHashMap<String, Integer> scores = new LinkedHashMap<>();
-    private static LinkedHashMap<String, Integer> addedScores = new LinkedHashMap<>();
+    private static ArrayList<LinkedHashMap<String, Integer>> addedScores = new ArrayList<>();
     private static int turns = 0;
 
     private static int numPlayers = 0;
+    private static int playerTurn = 0;
     private static ArrayList<String> playerNames = new ArrayList<>(); 
     public static void main(String args[]){
         
@@ -33,7 +34,7 @@ class Yahtzee{
         showDialog(frame);
         System.out.println(playerNames);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500,650);
+        frame.setSize(500,800);
 
 
 
@@ -92,24 +93,45 @@ class Yahtzee{
         
         frame.add(dicePanel);
         JPanel scoresPanel = new JPanel();
-        GridLayout scoresLayout = new GridLayout(13, 3);
+        GridLayout scoresLayout = new GridLayout(14, 2+numPlayers);
+        scoresLayout.setHgap(3);
         scoresPanel.setLayout(scoresLayout);
+        JLabel handLabel = new JLabel("Scores");
+        scoresPanel.add(handLabel);
+        for (String player: playerNames){
+            System.out.println(player);
+            JLabel playerLabel = new JLabel(player);
+            scoresPanel.add(playerLabel);
+            addedScores.add(new LinkedHashMap<String, Integer>());
+        }
+        JLabel emptyLabel = new JLabel("");
+        scoresPanel.add(emptyLabel);
+        scoresPanel.revalidate();
+        scoresPanel.repaint();
 
         ArrayList<JLabel> scoresHeadings = new ArrayList<>();
-        LinkedHashMap<String, JLabel> scoresLabels = new LinkedHashMap<>();
+        ArrayList<LinkedHashMap<String, JLabel>> scoresLabels = new ArrayList<>(numPlayers);
         LinkedHashMap<String, JButton> keepButtons = new LinkedHashMap<>();
+        for (int i=0; i<numPlayers; i++){
+            scoresLabels.add(new LinkedHashMap<String, JLabel>());
+        }
         for  (String key : emptyScores.keySet()){
             //System.out.println(key);
             JLabel scoreHeading = new JLabel(key);
-            JLabel scoreLabel = new JLabel("");
+
             JButton keepButton = new JButton("Keep");
 
             scoresHeadings.add(scoreHeading);
-            scoresLabels.put(key, scoreLabel);
+            scoresPanel.add(scoreHeading);
+            for (int i=0; i<numPlayers; i++){
+                JLabel scoreLabel = new JLabel("");
+                scoresPanel.add(scoreLabel);
+                scoresLabels.get(i).put(key, scoreLabel);
+            }
             keepButtons.put(key, keepButton);
             keepButton.setEnabled(false);
-            scoresPanel.add(scoreHeading);
-            scoresPanel.add(scoreLabel);
+            
+            
             scoresPanel.add(keepButton);
         }
 
@@ -142,9 +164,9 @@ class Yahtzee{
                     }
                     ScoringFunctions scoringFunctions = new ScoringFunctions(rolls);
                     scores = scoringFunctions.getScores();
-                    YahtzeeFunctions.setScoreLabels(scores, scoresLabels, addedScores);
+                    YahtzeeFunctions.setScoreLabels(scores, scoresLabels.get(playerTurn), addedScores.get(playerTurn));
                     for (String key: keepButtons.keySet()){
-                        if (!addedScores.containsKey(key)){
+                        if (!addedScores.get(playerTurn).containsKey(key)){
                             JButton button = keepButtons.get(key);
                             button.setEnabled(true);
                         }
@@ -177,7 +199,7 @@ class Yahtzee{
                     }
                     ScoringFunctions scoringFunctions = new ScoringFunctions(rolls);
                     scores = scoringFunctions.getScores();
-                    YahtzeeFunctions.setScoreLabels(scores, scoresLabels, addedScores);
+                    YahtzeeFunctions.setScoreLabels(scores, scoresLabels.get(playerTurn), addedScores.get(playerTurn));
 
                     }
                     
@@ -202,11 +224,12 @@ class Yahtzee{
 
                     int value = scores.get(key);
                     button.setEnabled(false);
-                    scoresLabels.get(key).setForeground(new Color(0,0,0));
-                    addedScores.put(key, value);
-                    turns++;
+                    scoresLabels.get(playerTurn).get(key).setForeground(new Color(0,0,0));
+                    addedScores.get(playerTurn).put(key, value);
+                    
 
-                    if (turns<13){
+
+                    if (turns<12 || !(playerTurn==numPlayers-1)){
                         for (JCheckBox box: rerollBoxes){
                             box.setSelected(false);}
                         for (JButton b: keepButtons.values()){
@@ -217,25 +240,48 @@ class Yahtzee{
                         rollDice.setEnabled(true);
                         
                     } else {
+                        JPanel finalScoresPanel = new JPanel();
+                        GridLayout finalScoresLayout = new GridLayout(3, numPlayers+2);
+                        finalScoresLayout.setHgap(3);
+                        finalScoresPanel.setLayout(finalScoresLayout);
+                        
+                        
+                        String[] scoreHeadings = {"Top Section Score", "Bottom Section Score", "Final Score"};
+                        String[] topHalfScores = new String[3];
+                        String[] bottomHalfScores = new String[3];
+                        String[] finalOverallScores = new String[3];
+                        
+                        for (int i= 0; i<numPlayers; i++){
+                            int[] finalScores = YahtzeeFunctions.evaluateScores(addedScores.get(i));
 
-                        int[] finalScores = YahtzeeFunctions.evaluateScores(addedScores);
-                        //StringBuilder topScoresText = new StringBuilder();
-                        //StringBuilder finalScoresText = new StringBuilder();
-                        //StringBuilder finalScoresText = new StringBuilder();
-                        //finalScoresText.append("Top Half Score: ").append(finalScores[0]).append('\n');
-                        //finalScoresText.append("Bottom Half Score: ").append(finalScores[1]).append('\n');
-                        //finalScoresText.append("Overall Score: ").append(finalScores[2]).append('\n');
-                        String topHalfScoreString = Integer.toString(finalScores[0]);
-                        String bottomHalfString = Integer.toString(finalScores[1]);
-                        String overallString = Integer.toString(finalScores[2]);
-                        topHalfScoreLabel.setText("Top Half Score: "+ topHalfScoreString);
-                        bottomHalfScoreLabel.setText( "Bottom Half Score: "+bottomHalfString);
-                        overallScoreLabel.setText( "Final Score: "+overallString);
-                        //JTextArea finalScoresLabel = new JTextArea(finalScoresText.toString());
-                        //frame.add(finalScoresLabel);
+                            topHalfScores[i]=  Integer.toString(finalScores[0]);
+                            bottomHalfScores[i] =  Integer.toString(finalScores[1]);
+                            finalOverallScores[i] = Integer.toString(finalScores[2]);
+                            }
+                        String[][] finalScoresArrayList = {topHalfScores, bottomHalfScores, finalOverallScores};
+                        for (int i=0; i<3; i++){
+                            finalScoresPanel.add(new JLabel(scoreHeadings[i]));
+                            for (int j=0; j<numPlayers; j++){
+                                finalScoresPanel.add(new JLabel(finalScoresArrayList[i][j]));
+                            }
+                            finalScoresPanel.add(new JLabel(""));
+                        }
                         newGameButton.setText("New Game");
-                        //frame.revalidate();
-                        //frame.repaint();
+                        frame.add(finalScoresPanel);
+                        frame.revalidate();
+                        frame.repaint(); 
+                    }
+                    for (String key: scoresLabels.get(playerTurn).keySet()){
+                        if (!addedScores.get(playerTurn).containsKey(key)){
+                            scoresLabels.get(playerTurn).get(key).setText("");
+                        }
+                    }
+                    if (playerTurn<numPlayers-1){
+                        playerTurn++;
+                        
+                    }else{
+                        playerTurn=0;
+                        turns++;
                     }
 
                 }   
@@ -248,8 +294,8 @@ class Yahtzee{
                 playerNames.clear();
                 rolls.clear();
                 addedScores.clear();
-                for (String key: scoresLabels.keySet()){
-                    scoresLabels.get(key).setText("");
+                for (String key: scoresLabels.get(playerTurn).keySet()){
+                    scoresLabels.get(playerTurn).get(key).setText("");
                     keepButtons.get(key).setEnabled(true);
                 }
                 nRerolls=0;
@@ -288,7 +334,7 @@ class Yahtzee{
         //    JOptionPane.PLAIN_MESSAGE
         //);
 
-        JDialog inputDialog = new JDialog(parentFrame);
+        JDialog inputDialog = new JDialog(parentFrame, "Welcome", true);
         
         inputDialog.setLayout(new BorderLayout());
         inputDialog.setSize(300, 400);
@@ -327,6 +373,7 @@ class Yahtzee{
                             } 
                             playerNames.add(playerName);
                         }
+                        parentFrame.repaint();
                         inputDialog.dispose();
                     }
                 });
