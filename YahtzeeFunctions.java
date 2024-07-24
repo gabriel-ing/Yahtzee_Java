@@ -45,12 +45,12 @@ public class YahtzeeFunctions{
         "Fives", "Sixes"};
         List<String> topHalfKeysList = Arrays.asList(topHalfKeys);
         for (String key: addedScores.keySet()){
-            System.out.print(key);
-            System.out.print(addedScores.get(key));
-            System.out.println("");
+            //System.out.print(key);
+            //System.out.print(addedScores.get(key));
+            //System.out.println("");
 
             if (topHalfKeysList.contains(key)){
-                System.out.println("Tophalf");
+                //System.out.println("Tophalf");
                 topHalfTotal+= addedScores.get(key);
             } else {
                 bottomHalfTotal +=addedScores.get(key);

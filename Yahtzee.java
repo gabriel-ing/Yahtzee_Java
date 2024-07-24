@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 
 
 class Yahtzee{
@@ -26,26 +27,64 @@ class Yahtzee{
         for (int i=0; i<5; i++){
             rolls.add(1);
         }
-        //System.out.println(rolls);
+        
+        //Initialise an empty score sheet to help structure the frame.
         ScoringFunctions initialScoringFunction = new ScoringFunctions(rolls);
         LinkedHashMap<String, Integer> emptyScores = initialScoringFunction.getEmptyScores();
-        //System.out.println(emptyScores);
-        JFrame frame = new JFrame("Yahtzee Game");
-        showDialog(frame);
-        System.out.println(playerNames);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        int width = 400+numPlayers*40;
-        frame.setSize(width,800);
-
-
-
         
-        JButton rollDice = new JButton("Roll"); 
 
-        JLabel heading = new JLabel("Press the button to roll dice:");
+        // Create the app frame
+        JFrame frame = new JFrame("Yahtzee");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        int width = 400+numPlayers*60;
+        frame.setSize(width,800);
+        frame.setLayout(new GridBagLayout());
+        GridBagConstraints frameGBC = new GridBagConstraints();
+        frameGBC.weightx = 1;
+        frameGBC.weighty=1;
+
+
+        //Create pop-up for player details
+        showDialog(frame);
+        
+        
+
+        JPanel headingPanel = new JPanel();
+        GridBagLayout headingLayout = new GridBagLayout();
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        headingPanel.setLayout(headingLayout);
+        String welcomeText = "Welcome To Yahtzee! ";
+        JLabel heading = new JLabel(welcomeText);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        headingPanel.add(heading, gbc);
+
+        String playerTurnText =playerNames.get(0) +"'s turn to begin";
+        JLabel playerTurnLabel = new JLabel(playerTurnText);
+        playerTurnLabel.setFont(new Font(playerTurnLabel.getFont().getName(), Font.BOLD, 28));
+        playerTurnLabel.setForeground(new Color(255, 25,25));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        headingPanel.add(playerTurnLabel, gbc);
+
         JLabel rollsLabel = new JLabel("Roll Now");
-        JLabel rerollLabel = new JLabel("Select the dice to REROLL!");
+        JLabel rerollLabel = new JLabel("When you are ready, press to roll dice.");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        headingPanel.add(rerollLabel, gbc);
+        JButton rollDice = new JButton("Roll Dice"); 
+        rollDice.setPreferredSize(new Dimension(200, 100));
+        rollDice.setFont(new Font(rollDice.getFont().getName(), Font.BOLD, 28));
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        headingPanel.add(rollDice, gbc);
 
+
+        frameGBC.gridx=0;
+        frameGBC.gridy=0;
+        frame.add(headingPanel, frameGBC);
 
 
         JPanel dicePanel= new JPanel();
@@ -82,17 +121,20 @@ class Yahtzee{
             rerollBoxes.add(checkBox);
             dicePanel.add(checkBox);
         }
-        frame.getContentPane().add(heading);
+        //frame.getContentPane().add(heading);
         
-        frame.getContentPane().setLayout(new java.awt.FlowLayout());
-        frame.getContentPane().add(rollDice);
+        //frame.getContentPane().setLayout(new java.awt.GridLayout(0, 1));
+        //frame.getContentPane().add(rollDice);
         //frame.add(rollsLabel);
-        frame.getContentPane().add(rerollLabel);
+        //frame.getContentPane().add(rerollLabel);
         
         
 
-        
-        frame.add(dicePanel);
+        frameGBC.gridx=0;
+        frameGBC.gridy=1;
+        frame.add(dicePanel, frameGBC);
+
+
         JPanel scoresPanel = new JPanel();
         GridLayout scoresLayout = new GridLayout(14, 2+numPlayers);
         scoresLayout.setHgap(3);
@@ -100,7 +142,7 @@ class Yahtzee{
         JLabel handLabel = new JLabel("Scores");
         scoresPanel.add(handLabel);
         for (String player: playerNames){
-            System.out.println(player);
+            //System.out.println(player);
             JLabel playerLabel = new JLabel(player);
             scoresPanel.add(playerLabel);
             addedScores.add(new LinkedHashMap<String, Integer>());
@@ -135,23 +177,36 @@ class Yahtzee{
             
             scoresPanel.add(keepButton);
         }
+        frameGBC.gridx=0;
+        frameGBC.gridy=2;
+       
+        frame.add(scoresPanel, frameGBC);
 
-        frame.add(scoresPanel);
+        //JPanel finalScoresPanel = new JPanel(); 
+        //finalScoresPanel.setLayout(new GridLayout(3,0));
+        //JLabel topHalfScoreLabel = new JLabel(" "); 
+        //JLabel bottomHalfScoreLabel = new JLabel(" ");
+        //JLabel overallScoreLabel = new JLabel(" ");
+
+        //finalScoresPanel.add(topHalfScoreLabel);
+        //finalScoresPanel.add(bottomHalfScoreLabel);
+        //finalScoresPanel.add(overallScoreLabel);
+
+        //frameGBC.gridx=0;
+        //frameGBC.gridy=3;
+        //frame.add(finalScoresPanel, frameGBC);
+
+        frameGBC.gridx=0;
+        frameGBC.gridy=4;
         JButton newGameButton = new JButton("Restart Game");
-        frame.add(newGameButton);
-        JLabel topHalfScoreLabel = new JLabel(""); 
-        JLabel bottomHalfScoreLabel = new JLabel("");
-        JLabel overallScoreLabel = new JLabel("");
-        frame.add(topHalfScoreLabel);
-        frame.add(bottomHalfScoreLabel);
-        frame.add(overallScoreLabel);
+        frame.add(newGameButton, frameGBC);
         frame.setVisible(true);
 
         
         rollDice.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 if (nRerolls==0){
-                    System.out.println(playerNames);
+                    //System.out.println(playerNames);
                     rolls.clear();
                     rolls = YahtzeeFunctions.rollFiveDice();
 
@@ -172,7 +227,8 @@ class Yahtzee{
                             button.setEnabled(true);
                         }
                     }
-                    }
+                    rerollLabel.setText("Select the Dice to re-roll!");
+                }
                 
                 else if (nRerolls<3){
                     
@@ -191,10 +247,10 @@ class Yahtzee{
                     }
                     output.append('\n');
                     rollsLabel.setText(output.toString());
-                    System.out.println("rerollshere");
-                    System.out.println(rerolls);
+                    //System.out.println("rerollshere");
+                    //System.out.println(rerolls);
                     for (int j=0; j<5; j++){
-                        System.out.println(j);
+                        //System.out.println(j);
                         rollsLabels[j].setIcon(new ImageIcon(dieIcons[rerolls.get(j)-1]));
 
                     }
@@ -268,7 +324,10 @@ class Yahtzee{
                             finalScoresPanel.add(new JLabel(""));
                         }
                         newGameButton.setText("New Game");
-                        frame.add(finalScoresPanel);
+                        
+                        frameGBC.gridx=0;
+                        frameGBC.gridy=3;
+                        frame.add(finalScoresPanel, frameGBC);
                         frame.revalidate();
                         frame.repaint(); 
                     }
@@ -279,11 +338,16 @@ class Yahtzee{
                     }
                     if (playerTurn<numPlayers-1){
                         playerTurn++;
+                        String playerTurnString= playerNames.get(playerTurn)+"'s Turn!";
+                        playerTurnLabel.setText(playerTurnString);
                         
                     }else{
                         playerTurn=0;
                         turns++;
+                        String playerTurnString= playerNames.get(playerTurn)+"'s Turn!";
+                        playerTurnLabel.setText(playerTurnString);
                     }
+                    rerollLabel.setText("Press Roll Dice!");
 
                 }   
             });
@@ -346,7 +410,7 @@ class Yahtzee{
         
         getNumPlayers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                System.out.println("Yes");
+                //System.out.println("Yes");
                 Integer selectedNumber = (Integer) nPlayersBox.getSelectedItem();
                 numPlayers = selectedNumber.intValue();
                 getNumPlayers.setEnabled(false);
@@ -363,7 +427,7 @@ class Yahtzee{
                 panel.add(inputNamesPanel);
                 
                 JPanel buttonPanel = new JPanel();
-                JButton enterGameButton = new JButton("Enter Game");
+                JButton enterGameButton = new JButton("Create Game");
 
                 buttonPanel.add(enterGameButton);
 
