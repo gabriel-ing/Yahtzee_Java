@@ -34,7 +34,8 @@ class Yahtzee{
         showDialog(frame);
         System.out.println(playerNames);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500,800);
+        int width = 400+numPlayers*40;
+        frame.setSize(width,800);
 
 
 
@@ -294,21 +295,23 @@ class Yahtzee{
                 playerNames.clear();
                 rolls.clear();
                 addedScores.clear();
-                for (String key: scoresLabels.get(playerTurn).keySet()){
-                    scoresLabels.get(playerTurn).get(key).setText("");
-                    keepButtons.get(key).setEnabled(true);
-                }
-                nRerolls=0;
-                rollDice.setEnabled(true);
-                topHalfScoreLabel.setText("");
-                bottomHalfScoreLabel.setText("");
-                overallScoreLabel.setText("");
-                rollsLabel.setText("Roll Now");
+                main(new String[] {});
+                frame.dispose();
+                //for (String key: scoresLabels.get(playerTurn).keySet()){
+                //    scoresLabels.get(playerTurn).get(key).setText("");
+                //    keepButtons.get(key).setEnabled(true);
+                //}
+                //nRerolls=0;
+                //rollDice.setEnabled(true);
+                //topHalfScoreLabel.setText("");
+                //bottomHalfScoreLabel.setText("");
+                //overallScoreLabel.setText("");
+                //rollsLabel.setText("Roll Now");
 
-                for (JButton button: keepButtons.values()){
-                    button.setEnabled(false);
-                }
-                showDialog(frame);
+                //for (JButton button: keepButtons.values()){
+                //    button.setEnabled(false);
+                //}
+                //showDialog(frame);
             }
         });
 
