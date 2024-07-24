@@ -30,11 +30,11 @@ Lower Section:
 
  A dialog window will open up prompting for the number of players: 
 
-<img src=ExampleImages/initialDialog.png alt='Dialog box asking for the number of players and player names'>
+<img src=ExampleImages/initialDialog.png alt='Dialog box asking for the number of players and player names' width=40>
 
 Select the number of players and add in player names (optional), then click `Create Game`, a game will be created: 
 
-<img src=ExampleImages/gameDisplay.png alt='Dialog box asking for the number of players and player names'>
+<img src=ExampleImages/gameDisplay.png alt='Dialog box asking for the number of players and player names' width=70>
 
 Each turn, Click `Roll Dice`, then select any number dice to reroll using the checkboxes. The scores available for each box will appear in Red. Click the `Keep` button to fill these boxes. 
 
