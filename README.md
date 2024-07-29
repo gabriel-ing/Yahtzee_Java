@@ -26,7 +26,7 @@ Lower Section:
 
 
 ### Usage 
- Download `Yahtzee.class` and run with `java Yahtzee`. 
+ Download the files and open the directory in a terminal. Compile Yahtzee.java (`javac Yahtzee.java`) and then run with `java Yahtzee`.  
 
  A dialog window will open up prompting for the number of players: 
 
